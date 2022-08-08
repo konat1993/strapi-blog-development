@@ -1,18 +1,21 @@
-'use strict';
+'use strict'
 
 /**
  * `is-admin` policy.
  */
 
 module.exports = (policyContext, config, { strapi }) => {
-    // Add your own logic here.
-    strapi.log.info('In is-admin policy mate.');
+  // policyContext -> have info about our user
 
-    const canDoSomething = true;
+  const isEligible = policyContext.state.user && policyContext.state.user.role.code === 'Administrator' // 'Administrator'
 
-    if (canDoSomething) {
-      return true;
-    }
+  // Add your own logic here.
+  strapi.log.info('In is-admin policy mate.')
+  console.log('policy', policyContext.state)
+  console.log('iseliglable', isEligible)
+  if (isEligible) {
+    return true
+  }
 
-    return false;
-};
+  return false
+}
