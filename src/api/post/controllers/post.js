@@ -52,6 +52,15 @@ module.exports = createCoreController('api::post.post', ({ strapi }) => ({
 
         const sanitizedPosts = await this.sanitizeOutput(publicPosts, ctx)
         return this.transformResponse(sanitizedPosts)
+    },
+
+    async findOne(ctx) {
+        const { id } = ctx.params
+        if (ctx.state.user) return await super.findOne(ctx, id)
+
+        const { data, meta } = await super.findOne(ctx, id)
+        const publicPost = data.attributes.premium ? null : data
+        return { data: publicPost, meta }
     }
 }))
 
