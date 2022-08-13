@@ -20,10 +20,15 @@ module.exports = createCoreController('api::post.post', ({ strapi }) => ({
     // }
     // 2nd solution (better than 1st one):
     async find(ctx) {
-        if (ctx.state.user) return await super.find(ctx)
+        const isRequestingNonPremium = ctx.query.filters &&
+            ctx.query.filters.premium === false // another case for user if he want to fetch only no premium posts
+
+        if (ctx.state.user || isRequestingNonPremium) return await super.find(ctx)
 
         const filterNoPremiumPosts = await strapi.service('api::post.post').find({
+            ...ctx.query,
             filters: {
+                ...ctx.query.filters,
                 premium: false
             },
         })
@@ -31,3 +36,7 @@ module.exports = createCoreController('api::post.post', ({ strapi }) => ({
         return this.transformResponse(sanitizedPosts)
     }
 }))
+
+
+
+
