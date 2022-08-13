@@ -11,6 +11,7 @@ module.exports = createCoreController('api::post.post', ({ strapi }) => ({
     // To make it work you have to create route for that e.q in post/routes/custom-route.js
     // And enable user to send request by making it public in role settings in Strapi admin settings
     async exampleAction(ctx) {
+        await strapi.service('api::post.post').exampleService({myParam: 'example param'})
         try {
             ctx.body = 'ok'
         } catch (err) {
@@ -22,7 +23,8 @@ module.exports = createCoreController('api::post.post', ({ strapi }) => ({
     async find(ctx) {
         // some custom logic here
         ctx.query = { ...ctx.query, local: 'en' }
-        console.log('ctx: ', ctx.query)
+        // console.log('query: ', ctx.query)
+        // console.log('ctx: ', ctx)
         //example:
         // /api/posts?publicationState=preview:
         /*
