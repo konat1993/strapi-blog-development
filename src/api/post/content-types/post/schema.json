@@ -55,7 +55,14 @@
     "premium": {
       "type": "boolean",
       "default": false,
-      "required": true
+      "required": true,
+      "private": true
+    },
+    "likedBy": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "likes"
     }
   }
 }
