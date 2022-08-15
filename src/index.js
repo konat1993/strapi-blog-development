@@ -7,7 +7,15 @@ module.exports = {
    *
    * This gives you an opportunity to extend code.
    */
-  register(/*{ strapi }*/) {},
+  register({ strapi }) {
+    const extensionService = strapi.plugin('graphql').service('extension')
+
+    //this is how we hann disable some shadowCRUD functionalities and actions
+    extensionService.shadowCRUD('api::post.post').disable()
+    extensionService.shadowCRUD('api::post.post').disableQueries()
+    extensionService.shadowCRUD('api::post.post').disableMutations()
+    extensionService.shadowCRUD('api::tag.tag').disableActions(['update'])
+  },
 
   /**
    * An asynchronous bootstrap function that runs before
