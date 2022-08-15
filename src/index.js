@@ -10,11 +10,30 @@ module.exports = {
   register({ strapi }) {
     const extensionService = strapi.plugin('graphql').service('extension')
 
-    //this is how we hann disable some shadowCRUD functionalities and actions
-    extensionService.shadowCRUD('api::post.post').disable()
-    extensionService.shadowCRUD('api::post.post').disableQueries()
-    extensionService.shadowCRUD('api::post.post').disableMutations()
-    extensionService.shadowCRUD('api::tag.tag').disableActions(['update'])
+    const extension = () => ({
+      // GraphQL SDL
+      // extends the existing types
+      typeDefs: `
+          type Mutation {
+              likePost(id: ID!):  PostEntityResponse
+          }
+      `,
+      // resolvers: {
+      //   Query: {
+      //     address: {
+      //       resolve() {
+      //         return { value: { city: 'Montpellier' } };
+      //       },
+      //     },
+      //   },
+      // },
+      // resolversConfig: {
+      //   'Query.address': {
+      //     auth: false,
+      //   },
+      // },
+    });
+    extensionService.use(extension);
   },
 
   /**
