@@ -1,4 +1,6 @@
-'use strict';
+'use strict'
+
+const { likePostMutation, getLikePostResolver, likePostMutationConfig } = require("./api/post/graphql/post")
 
 module.exports = {
   /**
@@ -8,32 +10,23 @@ module.exports = {
    * This gives you an opportunity to extend code.
    */
   register({ strapi }) {
-    const extensionService = strapi.plugin('graphql').service('extension')
+    const extensionService = strapi.plugin("graphql").service("extension")
 
-    const extension = () => ({
+    const extension = ({ nexus }) => ({
       // GraphQL SDL
       // extends the existing types
-      typeDefs: `
-          type Mutation {
-              likePost(id: ID!):  PostEntityResponse
-          }
-      `,
-      // resolvers: {
-      //   Query: {
-      //     address: {
-      //       resolve() {
-      //         return { value: { city: 'Montpellier' } };
-      //       },
-      //     },
-      //   },
-      // },
-      // resolversConfig: {
-      //   'Query.address': {
-      //     auth: false,
-      //   },
-      // },
-    });
-    extensionService.use(extension);
+      typeDefs: likePostMutation,
+      resolvers: {
+        Mutation: {
+          likePost: getLikePostResolver(strapi),
+        },
+      },
+      // example test how auth works:
+      resolversConfig: {
+        "Mutation.likePost": likePostMutationConfig
+      },
+    })
+    extensionService.use(extension)
   },
 
   /**
@@ -43,5 +36,5 @@ module.exports = {
    * This gives you an opportunity to set up your data model,
    * run jobs, or perform some special logic.
    */
-  bootstrap(/*{ strapi }*/) {},
-};
+  bootstrap(/*{ strapi }*/) { },
+}

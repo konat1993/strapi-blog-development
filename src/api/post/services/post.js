@@ -61,7 +61,6 @@ module.exports = createCoreService('api::post.post', ({ strapi }) => ({
         const { likedBy } = await strapi.entityService.findOne("api::post.post", postId, {
             populate: ["likedBy"]
         })
-
         // use the underlying entity service API to update the current post with the new relation
         const updatedPost = await strapi.entityService.update("api::post.post", postId, {
             data: {
