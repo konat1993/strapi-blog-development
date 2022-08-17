@@ -8,7 +8,9 @@
     "kind": "plugin",
     "displayName": "Github Projects"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@octokit/request": "^6.2.1"
+  },
   "author": {
     "name": "A Strapi developer"
   },

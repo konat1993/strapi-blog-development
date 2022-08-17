@@ -1,10 +1,11 @@
 module.exports = [
   {
     method: 'GET',
-    path: '/',
-    handler: 'myController.index',
+    path: '/repos',  //=> available at route: //localhost:1337/github-projects/repos
+    handler: 'getReposController.index',
     config: {
       policies: [],
+      auth: false, // this is temporary disabled for testing route. Later on we will handle authorized service for only admin panel users
     },
   },
 ];
