@@ -10,6 +10,11 @@ const config = {
   //     "app.components.LeftMenu.plugins": "Pluginsy ziomek"
   //   }
   // }
+  // translations: {
+  //   en: {
+  //     "content-type-builder.plugin.name": "CTB ziomek"
+  //   }
+  // }
   // config: {
   //   notifications: {
   //     release: false
