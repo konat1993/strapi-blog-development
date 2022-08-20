@@ -1,11 +1,23 @@
 import React from 'react'
 import { Table, Thead, Tbody, Tr, Td, Th } from '@strapi/design-system/Table'
-import { Box, BaseCheckbox, Typography } from '@strapi/design-system'
+import { Box, BaseCheckbox, Typography, Loader, Alert } from '@strapi/design-system'
+import Octokit from '../../api/services/Octokit'
 
 const COL_COUNT = 5
 const ROW_COUNT = 6
 
 const Repo = () => {
+    const { data: repos, isLoading, isError, error } = Octokit.useGithub()
+
+    if (isLoading) return <Loader style={{ textAlign: 'center', marginTop: '30px' }} />
+    if (isError) return <Alert
+        closeLabel='Close alert'
+        title='Error fetching repositories'
+        variant='danger'
+    >
+        {error.response?.data?.error?.message || error.message}
+    </Alert>
+
     return (
         <Box padding={8} background="neutral100">
             <Table colCount={COL_COUNT} rowCount={ROW_COUNT}>

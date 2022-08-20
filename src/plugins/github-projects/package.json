@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@octokit/request": "^6.2.1",
-    "markdown-it": "^13.0.1"
+    "markdown-it": "^13.0.1",
+    "react-query": "^3.39.2"
   },
   "author": {
     "name": "A Strapi developer"
