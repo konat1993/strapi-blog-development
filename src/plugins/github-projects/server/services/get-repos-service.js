@@ -24,7 +24,7 @@ module.exports = ({ strapi }) => ({
     })
     // id, name, shortDescription, url, longDescription
     // https://raw.githubusercontent.com/konat1993/my-movies-platform/master/README.md
-    return Promise.all(
+    const allData = await Promise.all(
       result.data.map(async (item) => {
         const { id, name, description, html_url: url, owner: { login }, default_branch: branch } = item
         try {
@@ -53,5 +53,7 @@ module.exports = ({ strapi }) => ({
         }
       })
     )
+    const nonNullData = allData.filter(el => !!el)
+    return nonNullData
   },
 })

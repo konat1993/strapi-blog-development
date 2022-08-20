@@ -1,15 +1,24 @@
 import React from 'react'
 import { Table, Thead, Tbody, Tr, Td, Th } from '@strapi/design-system/Table'
-import { Box, BaseCheckbox, Typography, Loader, Alert } from '@strapi/design-system'
+import { Box, BaseCheckbox, Typography, Loader, Alert, Flex, IconButton, Link } from '@strapi/design-system'
+import { Pencil, Trash } from '@strapi/icons'
 import Octokit from '../../api/services/Octokit'
+import styled from 'styled-components'
 
 const COL_COUNT = 5
-const ROW_COUNT = 6
+
+const DescriptionTd = styled(Td)`
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+`
+
 
 const Repo = () => {
-    const { data: repos, isLoading, isError, error } = Octokit.useGithub()
+    const { data: repos, isLoading, isError, error, status } = Octokit.useGithub()
 
-    if (isLoading) return <Loader style={{ textAlign: 'center', marginTop: '30px' }} />
+    if (isLoading) return <Loader style={{ textAlign: 'center', marginTop: '30px' }}>{''}</Loader>
     if (isError) return <Alert
         closeLabel='Close alert'
         title='Error fetching repositories'
@@ -17,10 +26,11 @@ const Repo = () => {
     >
         {error.response?.data?.error?.message || error.message}
     </Alert>
-
+    console.log('state ', status)
+    console.log('data ', repos)
     return (
         <Box padding={8} background="neutral100">
-            <Table colCount={COL_COUNT} rowCount={ROW_COUNT}>
+            <Table colCount={COL_COUNT} rowCount={repos.length}>
                 <Thead>
                     <Tr>
                         <Th>
@@ -38,41 +48,41 @@ const Repo = () => {
                         <Th>
                             <Typography variant="sigma">Actions</Typography>
                         </Th>
-                        {/* <Th>
-                  <VisuallyHidden>Actions</VisuallyHidden>
-                </Th> */}
                     </Tr>
                 </Thead>
-                {/* <Tbody>
-              {entries.map(entry => <Tr key={entry.id}>
-                  <Td>
-                    <BaseCheckbox aria-label={`Select ${entry.contact}`} />
-                  </Td>
-                  <Td>
-                    <Typography textColor="neutral800">{entry.id}</Typography>
-                  </Td>
-                  <Td>
-                    <Avatar src={entry.cover} alt={entry.contact} />
-                  </Td>
-                  <Td>
-                    <Typography textColor="neutral800">{entry.description}</Typography>
-                  </Td>
-                  <Td>
-                    <Typography textColor="neutral800">{entry.category}</Typography>
-                  </Td>
-                  <Td>
-                    <Typography textColor="neutral800">{entry.contact}</Typography>
-                  </Td>
-                  <Td>
-                    <Flex>
-                      <IconButton onClick={() => console.log('edit')} label="Edit" noBorder icon={<Pencil />} />
-                      <Box paddingLeft={1}>
-                        <IconButton onClick={() => console.log('delete')} label="Delete" noBorder icon={<Trash />} />
-                      </Box>
-                    </Flex>
-                  </Td>
-                </Tr>)}
-            </Tbody> */}
+                <Tbody>
+                    {repos.map(repo => {
+                        const { id, name, shortDescription, url, project } = repo
+                        return (
+                            <Tr key={id}>
+                                <Td>
+                                    <BaseCheckbox aria-label={`Select ${id}`} />
+                                </Td>
+                                <Td>
+                                    <Typography textColor="neutral800">{name}</Typography>
+                                </Td>
+                                <DescriptionTd>
+                                    <Typography textColor="neutral800">{shortDescription}</Typography>
+                                </DescriptionTd>
+                                <Td>
+                                    <Typography textColor="neutral800">
+                                        <Link href={url} isExternal>
+                                            {url}
+                                        </Link>
+                                    </Typography>
+                                </Td>
+                                <Td>
+                                    <Flex>
+                                        <IconButton label="Edit" noBorder icon={<Pencil />} />
+                                        <Box paddingLeft={1}>
+                                            <IconButton label="Delete" noBorder icon={<Trash />} />
+                                        </Box>
+                                    </Flex>
+                                </Td>
+                            </Tr>
+                        )
+                    })}
+                </Tbody>
             </Table>
         </Box>
     )
