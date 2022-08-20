@@ -2,6 +2,7 @@
 
 const { request } = require("@octokit/request")
 const axios = require("axios")
+const md = require("markdown-it")()
 
 module.exports = ({ strapi }) => ({
   getProjectForRepo: async (repo) => {
@@ -34,7 +35,7 @@ module.exports = ({ strapi }) => ({
             name,
             shortDescription: description,
             url,
-            longDescription
+            longDescription: md.render(longDescription).replaceAll('\n', '</br>')
           }
           //Add some logic to search for an existing project for the current repo
           const relatedProjectId = await strapi
