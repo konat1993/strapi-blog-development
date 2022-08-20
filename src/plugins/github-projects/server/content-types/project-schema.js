@@ -20,7 +20,8 @@ module.exports = {
     },
     attributes: {
         repositoryId: {
-            type: 'uid'
+            type: 'uid',
+            unique: true
         },
         title: {
             type: 'string',
