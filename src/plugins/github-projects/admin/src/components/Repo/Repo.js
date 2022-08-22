@@ -1,7 +1,7 @@
 import React from 'react'
 import { Table, Thead, Tbody, Tr, Td, Th } from '@strapi/design-system/Table'
 import { Box, BaseCheckbox, Typography, Loader, Alert, Flex, IconButton, Link } from '@strapi/design-system'
-import { Pencil, Trash } from '@strapi/icons'
+import { Pencil, Trash, Plus } from '@strapi/icons'
 import Octokit from '../../api/services/Octokit'
 import styled from 'styled-components'
 
@@ -52,7 +52,7 @@ const Repo = () => {
                 </Thead>
                 <Tbody>
                     {repos.map(repo => {
-                        const { id, name, shortDescription, url, project } = repo
+                        const { id, name, shortDescription, url, projectId } = repo
                         return (
                             <Tr key={id}>
                                 <Td>
@@ -72,12 +72,17 @@ const Repo = () => {
                                     </Typography>
                                 </Td>
                                 <Td>
-                                    <Flex>
-                                        <IconButton label="Edit" noBorder icon={<Pencil />} />
-                                        <Box paddingLeft={1}>
-                                            <IconButton label="Delete" noBorder icon={<Trash />} />
-                                        </Box>
-                                    </Flex>
+                                    {projectId ?
+                                        <Flex>
+                                            <Link to={`/content-manager/collectionType/plugin::github-projects.project/${projectId}`}>
+                                                <IconButton label="Edit" noBorder icon={<Pencil />} />
+                                            </Link>
+                                            <Box paddingLeft={1}>
+                                                <IconButton label="Delete" noBorder icon={<Trash />} />
+                                            </Box>
+                                        </Flex> :
+                                        <IconButton label="Add" noBorder icon={<Plus />} />
+                                    }
                                 </Td>
                             </Tr>
                         )
