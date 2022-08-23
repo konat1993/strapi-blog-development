@@ -1,4 +1,4 @@
-import { useQuery } from "react-query"
+import { useQuery, useMutation } from "react-query"
 import instance from '../../utils/axiosInstance'
 
 export default {
@@ -8,6 +8,14 @@ export default {
             return response.data
         },
             { refetchOnWindowFocus: false }
+        )
+    },
+    useAddProject: () => {
+        return useMutation(async (repo) => {
+            const response = await instance.post('/github-projects/project', repo)
+            return response.data
+        },
+            { enabled: false, refetchOnWindowFocus: false }
         )
     }
 }

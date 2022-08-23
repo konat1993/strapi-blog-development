@@ -17,6 +17,7 @@ const DescriptionTd = styled(Td)`
 
 const Repo = () => {
     const { data: repos, isLoading, isError, error, status } = Octokit.useGithub()
+    const { mutate: addProject } = Octokit.useAddProject()
 
     const [selectedRepos, setSelectedRepos] = React.useState([])
 
@@ -28,10 +29,15 @@ const Repo = () => {
     >
         {error.response?.data?.error?.message || error.message}
     </Alert>
-    console.log('state ', status)
-    console.log('data ', repos)
+    // console.log('state ', status)
+    // console.log('data ', repos)
     const allChecked = repos.length === selectedRepos.length
     const isIndeterminate = repos.length > 0 && !allChecked // some repos selected but not all
+
+    const createProject = async (currentRepo) => {
+        addProject(currentRepo)
+    }
+
     return (
         <Box padding={8} background="neutral100">
             <Table colCount={COL_COUNT} rowCount={repos.length}>
@@ -97,7 +103,11 @@ const Repo = () => {
                                                 <IconButton label="Delete" noBorder icon={<Trash />} />
                                             </Box>
                                         </Flex> :
-                                        <IconButton label="Add" noBorder icon={<Plus />} />
+                                        <IconButton
+                                            label="Add"
+                                            noBorder icon={<Plus />}
+                                            onClick={() => createProject(repo)}
+                                        />
                                     }
                                 </Td>
                             </Tr>
