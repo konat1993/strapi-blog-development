@@ -7,6 +7,30 @@ import styled from 'styled-components'
 
 const COL_COUNT = 5
 
+const alertContent = (project) => ({
+    data: project,
+    idle: null,
+    success: project ? {
+        title: 'Project created',
+        message: `Successfully created project ${project.id}`,
+        variant: 'success'
+    } : null,
+    error: {
+        title: 'An error occurred',
+        message: 'Error creating the project. Please retry',
+        variant: 'danger'
+    }
+})
+
+const AlertContainer = styled.div`
+    position: absolute;
+    left: 50%;
+    transform: translateX(-30%);
+    top: 15px;
+    z-index: 10;
+    margin: 10px auto;
+    width: fit-content;
+`
 const DescriptionTd = styled(Td)`
     white-space: nowrap;
     overflow: hidden;
@@ -14,12 +38,25 @@ const DescriptionTd = styled(Td)`
     max-width: 300px;
 `
 
+const createAlert = (status, alertContent, closeHandler) => {
+    return (
+        <Alert closeLabel='Close alert' onClose={closeHandler} title={alertContent[status].title} variant={alertContent[status].variant}>
+            {alertContent[status].message}
+        </Alert>
+    )
+}
 
 const Repo = () => {
-    const { data: repos, isLoading, isError, error, status } = Octokit.useGithub()
-    const { mutate: addProject } = Octokit.useAddProject()
+    const { data: repos, isLoading, isError, error, isFetching } = Octokit.useGithub()
+    const {
+        mutate: addProject,
+        isLoading: isMutateLoading,
+        status,
+        data: project,
+    } = Octokit.useAddProject()
 
     const [selectedRepos, setSelectedRepos] = React.useState([])
+    const [open, setOpen] = React.useState(false)
 
     if (isLoading) return <Loader style={{ textAlign: 'center', marginTop: '30px' }}>{''}</Loader>
     if (isError) return <Alert
@@ -29,17 +66,23 @@ const Repo = () => {
     >
         {error.response?.data?.error?.message || error.message}
     </Alert>
-    // console.log('state ', status)
-    // console.log('data ', repos)
+
     const allChecked = repos.length === selectedRepos.length
     const isIndeterminate = repos.length > 0 && !allChecked // some repos selected but not all
 
     const createProject = async (currentRepo) => {
         addProject(currentRepo)
+        setOpen(true)
     }
 
+    const closeHandler = () => {
+        setOpen(false)
+    }
     return (
         <Box padding={8} background="neutral100">
+            <AlertContainer>
+                {(status === 'success' || status === 'error') && open && createAlert(status, alertContent(project), closeHandler)}
+            </AlertContainer>
             <Table colCount={COL_COUNT} rowCount={repos.length}>
                 <Thead>
                     <Tr>
@@ -94,20 +137,32 @@ const Repo = () => {
                                     </Typography>
                                 </Td>
                                 <Td>
-                                    {projectId ?
-                                        <Flex>
-                                            <Link to={`/content-manager/collectionType/plugin::github-projects.project/${projectId}`}>
-                                                <IconButton label="Edit" noBorder icon={<Pencil />} />
-                                            </Link>
-                                            <Box paddingLeft={1}>
-                                                <IconButton label="Delete" noBorder icon={<Trash />} />
-                                            </Box>
-                                        </Flex> :
-                                        <IconButton
-                                            label="Add"
-                                            noBorder icon={<Plus />}
-                                            onClick={() => createProject(repo)}
-                                        />
+                                    {
+                                        projectId ?
+                                            <Flex>
+                                                <Link to={`/content-manager/collectionType/plugin::github-projects.project/${projectId}`}>
+                                                    <IconButton
+                                                        disabled={isFetching || isMutateLoading}
+                                                        label="Edit"
+                                                        noBorder
+                                                        icon={<Pencil />}
+                                                    />
+                                                </Link>
+                                                <Box paddingLeft={1}>
+                                                    <IconButton
+                                                        disabled={isFetching || isMutateLoading}
+                                                        label="Delete"
+                                                        noBorder
+                                                        icon={<Trash />}
+                                                    />
+                                                </Box>
+                                            </Flex> :
+                                            <IconButton
+                                                disabled={isFetching || isMutateLoading}
+                                                label="Add"
+                                                noBorder icon={<Plus />}
+                                                onClick={() => createProject(repo)}
+                                            />
                                     }
                                 </Td>
                             </Tr>
