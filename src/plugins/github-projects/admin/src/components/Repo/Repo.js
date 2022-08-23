@@ -18,6 +18,8 @@ const DescriptionTd = styled(Td)`
 const Repo = () => {
     const { data: repos, isLoading, isError, error, status } = Octokit.useGithub()
 
+    const [selectedRepos, setSelectedRepos] = React.useState([])
+
     if (isLoading) return <Loader style={{ textAlign: 'center', marginTop: '30px' }}>{''}</Loader>
     if (isError) return <Alert
         closeLabel='Close alert'
@@ -28,13 +30,20 @@ const Repo = () => {
     </Alert>
     console.log('state ', status)
     console.log('data ', repos)
+    const allChecked = repos.length === selectedRepos.length
+    const isIndeterminate = repos.length > 0 && !allChecked // some repos selected but not all
     return (
         <Box padding={8} background="neutral100">
             <Table colCount={COL_COUNT} rowCount={repos.length}>
                 <Thead>
                     <Tr>
                         <Th>
-                            <BaseCheckbox aria-label="Select all entries" />
+                            <BaseCheckbox
+                                aria-label="Select all entries"
+                                indeterminate={isIndeterminate}
+                                value={allChecked}
+                                onValueChange={value => value ? setSelectedRepos(repos.map(repo => repo.id)) : setSelectedRepos([])}
+                            />
                         </Th>
                         <Th>
                             <Typography variant="sigma">Name</Typography>
@@ -56,7 +65,14 @@ const Repo = () => {
                         return (
                             <Tr key={id}>
                                 <Td>
-                                    <BaseCheckbox aria-label={`Select ${id}`} />
+                                    <BaseCheckbox
+                                        aria-label={`Select ${id}`}
+                                        value={selectedRepos.includes(id)}
+                                        onValueChange={value => {
+                                            const newSelectedRepos = value ? [...selectedRepos, id] : selectedRepos.filter(repoId => repoId !== id)
+                                            setSelectedRepos(newSelectedRepos)
+                                        }}
+                                    />
                                 </Td>
                                 <Td>
                                     <Typography textColor="neutral800">{name}</Typography>
