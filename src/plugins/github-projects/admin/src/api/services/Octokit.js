@@ -23,6 +23,22 @@ export default {
                 },
             }
         )
+    },
+    useDeleteProject: () => {
+        const queryClient = useQueryClient()
+        return useMutation(async (projectId) => {
+            const response = await instance.delete(`/github-projects/project/${projectId}`)
+            console.log('responsik ', response)
+            return response.data
+        },
+            {
+                enabled: false,
+                refetchOnWindowFocus: false,
+                onSuccess: () => {
+                    queryClient.invalidateQueries('github-repos')
+                },
+            }
+        )
     }
 }
 

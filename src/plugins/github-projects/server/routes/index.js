@@ -15,5 +15,13 @@ module.exports = [
     config: {
       policies: ['admin::isAuthenticatedAdmin'],
     },
+  },
+  {
+    method: 'DELETE',
+    path: '/project/:id',  //=> available at route: //localhost:1337/github-projects/repos
+    handler: 'projectController.delete',
+    config: {
+      policies: ['admin::isAuthenticatedAdmin'],
+    },
   }
 ];

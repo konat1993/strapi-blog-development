@@ -7,20 +7,32 @@ import styled from 'styled-components'
 
 const COL_COUNT = 5
 
-const alertContent = (project) => ({
-    data: project,
-    idle: null,
-    success: project ? {
-        title: 'Project created',
-        message: `Successfully created project ${project.id}`,
-        variant: 'success'
-    } : null,
-    error: {
-        title: 'An error occurred',
-        message: 'Error creating the project. Please retry',
-        variant: 'danger'
+const alertContent = (status, projectId) => {
+    if (status === 'CREATE') return {
+        success: {
+            title: 'Project created',
+            message: `Successfully created project ${projectId}`,
+            variant: 'success'
+        },
+        error: {
+            title: 'An error occurred',
+            message: 'Error creating the project. Please retry',
+            variant: 'danger'
+        }
     }
-})
+    if (status === 'DELETE') return {
+        success: {
+            title: 'Project deleted',
+            message: `Successfully deleted project ${projectId}`,
+            variant: 'success'
+        },
+        error: {
+            title: 'An error occurred',
+            message: 'Error deleting the project. Please retry',
+            variant: 'danger'
+        }
+    }
+}
 
 const AlertContainer = styled.div`
     position: absolute;
@@ -38,25 +50,14 @@ const DescriptionTd = styled(Td)`
     max-width: 300px;
 `
 
-const createAlert = (status, alertContent, closeHandler) => {
-    return (
-        <Alert closeLabel='Close alert' onClose={closeHandler} title={alertContent[status].title} variant={alertContent[status].variant}>
-            {alertContent[status].message}
-        </Alert>
-    )
-}
-
 const Repo = () => {
     const { data: repos, isLoading, isError, error, isFetching } = Octokit.useGithub()
-    const {
-        mutate: addProject,
-        isLoading: isMutateLoading,
-        status,
-        data: project,
-    } = Octokit.useAddProject()
+    const { mutateAsync: createProject, isLoading: isMutateLoading, } = Octokit.useAddProject()
+    const { mutateAsync: deleteProject, isLoading: isDeleteLoading } = Octokit.useDeleteProject()
 
     const [selectedRepos, setSelectedRepos] = React.useState([])
-    const [open, setOpen] = React.useState(false)
+
+    const [alerts, setAlerts] = React.useState([])
 
     if (isLoading) return <Loader style={{ textAlign: 'center', marginTop: '30px' }}>{''}</Loader>
     if (isError) return <Alert
@@ -70,18 +71,40 @@ const Repo = () => {
     const allChecked = repos.length === selectedRepos.length
     const isIndeterminate = repos.length > 0 && !allChecked // some repos selected but not all
 
-    const createProject = async (currentRepo) => {
-        addProject(currentRepo)
-        setOpen(true)
+    const handleCreateClick = async (currentRepo) => {
+        const response = await createProject(currentRepo)
+        if (response) {
+            setAlerts([...alerts, alertContent('CREATE', currentRepo.id).success])
+        } else {
+            setAlerts([...alerts, alertContent('CREATE', currentRepo.id).error])
+        }
+    }
+    const handleDeleteClick = async (projectId) => {
+        const response = await deleteProject(projectId)
+        if (response) {
+            setAlerts([...alerts, alertContent('DELETE', projectId).success])
+        } else {
+            setAlerts([...alerts, alertContent('DELETE', projectId).error])
+        }
     }
 
-    const closeHandler = () => {
-        setOpen(false)
+    const closeHandler = (alertId) => {
+        setAlerts(alerts.filter((alert, idx) => alertId !== idx))
     }
     return (
         <Box padding={8} background="neutral100">
             <AlertContainer>
-                {(status === 'success' || status === 'error') && open && createAlert(status, alertContent(project), closeHandler)}
+                {alerts.map((alert, alertId) => (
+                    <Alert
+                        key={alertId}
+                        closeLabel='Close alert'
+                        onClose={() => closeHandler(alertId)}
+                        title={alert.title}
+                        variant={alert.variant}
+                    >
+                        {alert.message}
+                    </Alert>
+                ))}
             </AlertContainer>
             <Table colCount={COL_COUNT} rowCount={repos.length}>
                 <Thead>
@@ -142,7 +165,7 @@ const Repo = () => {
                                             <Flex>
                                                 <Link to={`/content-manager/collectionType/plugin::github-projects.project/${projectId}`}>
                                                     <IconButton
-                                                        disabled={isFetching || isMutateLoading}
+                                                        disabled={isFetching || isMutateLoading || isDeleteLoading}
                                                         label="Edit"
                                                         noBorder
                                                         icon={<Pencil />}
@@ -150,18 +173,19 @@ const Repo = () => {
                                                 </Link>
                                                 <Box paddingLeft={1}>
                                                     <IconButton
-                                                        disabled={isFetching || isMutateLoading}
+                                                        disabled={isFetching || isMutateLoading || isDeleteLoading}
                                                         label="Delete"
                                                         noBorder
+                                                        onClick={() => handleDeleteClick(projectId)}
                                                         icon={<Trash />}
                                                     />
                                                 </Box>
                                             </Flex> :
                                             <IconButton
-                                                disabled={isFetching || isMutateLoading}
+                                                disabled={isFetching || isMutateLoading || isDeleteLoading}
                                                 label="Add"
                                                 noBorder icon={<Plus />}
-                                                onClick={() => createProject(repo)}
+                                                onClick={() => handleCreateClick(repo)}
                                             />
                                     }
                                 </Td>

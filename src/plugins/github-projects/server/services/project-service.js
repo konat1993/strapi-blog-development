@@ -1,9 +1,5 @@
 'use strict'
 
-// const { request } = require("@octokit/request")
-// const axios = require("axios")
-// const md = require("markdown-it")()
-
 module.exports = ({ strapi }) => ({
     create: async (repo, userId) => {
         const newProject = await strapi
@@ -20,5 +16,13 @@ module.exports = ({ strapi }) => ({
                 }
             })
         return newProject
+    },
+    delete: async (projectId) => {
+        const deletedProject = await strapi
+            .entityService
+            .delete("plugin::github-projects.project", projectId)
+
+        return deletedProject
     }
+
 })
