@@ -5,6 +5,7 @@ import { Pencil, Trash, Plus } from '@strapi/icons'
 import styled from 'styled-components'
 import Octokit from '../../api/services/Octokit'
 import { ConfirmationDialog } from '../ConfirmationDialog/ConfirmationDialog'
+import { BulkActions } from '../BulkActions'
 
 const COL_COUNT = 5
 
@@ -92,6 +93,7 @@ const Repo = () => {
     const closeHandler = (alertId) => {
         setAlerts(alerts.filter((alert, idx) => alertId !== idx))
     }
+    console.log({ repos })
     return (
         <Box padding={8} background="neutral100">
             {deletingProject && (
@@ -115,6 +117,16 @@ const Repo = () => {
                     </Alert>
                 ))}
             </AlertContainer>
+            {
+                selectedRepos.length > 0 && (
+                    <BulkActions
+                        selectedRepos={
+                            selectedRepos.map(
+                                repoId => repos.find(repo => repo.id === repoId)
+                            )
+                        } />
+                )
+            }
             <Table colCount={COL_COUNT} rowCount={repos.length}>
                 <Thead>
                     <Tr>
