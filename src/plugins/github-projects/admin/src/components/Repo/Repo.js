@@ -2,8 +2,9 @@ import React from 'react'
 import { Table, Thead, Tbody, Tr, Td, Th } from '@strapi/design-system/Table'
 import { Box, BaseCheckbox, Typography, Loader, Alert, Flex, IconButton, Link } from '@strapi/design-system'
 import { Pencil, Trash, Plus } from '@strapi/icons'
-import Octokit from '../../api/services/Octokit'
 import styled from 'styled-components'
+import Octokit from '../../api/services/Octokit'
+import { ConfirmationDialog } from '../ConfirmationDialog/ConfirmationDialog'
 
 const COL_COUNT = 5
 
@@ -56,8 +57,8 @@ const Repo = () => {
     const { mutateAsync: deleteProject, isLoading: isDeleteLoading } = Octokit.useDeleteProject()
 
     const [selectedRepos, setSelectedRepos] = React.useState([])
-
     const [alerts, setAlerts] = React.useState([])
+    const [deletingProject, setDeletingProject] = React.useState(undefined)
 
     if (isLoading) return <Loader style={{ textAlign: 'center', marginTop: '30px' }}>{''}</Loader>
     if (isError) return <Alert
@@ -65,7 +66,7 @@ const Repo = () => {
         title='Error fetching repositories'
         variant='danger'
     >
-        {error.response?.data?.error?.message || error.message}
+        {(error.response?.data?.error?.message || error.message)}
     </Alert>
 
     const allChecked = repos.length === selectedRepos.length
@@ -93,6 +94,14 @@ const Repo = () => {
     }
     return (
         <Box padding={8} background="neutral100">
+            {deletingProject && (
+                <ConfirmationDialog
+                    visible={!!deletingProject}
+                    message='Are you sure you want to delete this project?'
+                    onClose={() => setDeletingProject(undefined)}
+                    onConfirm={() => handleDeleteClick(deletingProject)}
+                />
+            )}
             <AlertContainer>
                 {alerts.map((alert, alertId) => (
                     <Alert
@@ -176,7 +185,7 @@ const Repo = () => {
                                                         disabled={isFetching || isMutateLoading || isDeleteLoading}
                                                         label="Delete"
                                                         noBorder
-                                                        onClick={() => handleDeleteClick(projectId)}
+                                                        onClick={() => setDeletingProject(projectId)}
                                                         icon={<Trash />}
                                                     />
                                                 </Box>
@@ -198,4 +207,4 @@ const Repo = () => {
     )
 }
 
-export default Repo
+export { Repo }

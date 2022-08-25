@@ -5,7 +5,6 @@ export default {
     useGithub: () => {
         return useQuery('github-repos', async () => {
             const response = await instance.get('/github-projects/repos')
-            console.log('stale')
             return response.data
         },
             { refetchOnWindowFocus: false }
@@ -28,7 +27,6 @@ export default {
         const queryClient = useQueryClient()
         return useMutation(async (projectId) => {
             const response = await instance.delete(`/github-projects/project/${projectId}`)
-            console.log('responsik ', response)
             return response.data
         },
             {

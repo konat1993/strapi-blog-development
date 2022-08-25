@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import Repo from '../../components/Repo/Repo'
+import { Repo } from '../../components/Repo'
 
 const HomePage = () => {
   return (
