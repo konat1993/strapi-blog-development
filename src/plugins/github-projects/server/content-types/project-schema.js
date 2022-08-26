@@ -34,7 +34,7 @@ module.exports = {
         repositoryUrl: {
             type: 'string',
         },
-        londDescription: {
+        longDescription: {
             type: 'richtext',
         },
         coverImage: {

@@ -37,6 +37,41 @@ export default {
                 },
             }
         )
+    },
+    useAddManyProjects: () => {
+        const queryClient = useQueryClient()
+        return useMutation(async (repos) => {
+            const response = await instance.post('/github-projects/projects', { repos })
+            return response.data
+        },
+            {
+                enabled: false,
+                refetchOnWindowFocus: false,
+                onSuccess: () => {
+                    queryClient.invalidateQueries('github-repos')
+                },
+            }
+        )
+    },
+    useDeleteManyProjects: () => {
+        const queryClient = useQueryClient()
+        return useMutation(async (projectIds) => {
+            console.log({projectIds})
+            const response = await instance.delete('/github-projects/projects', {
+                params: {
+                    projectIds
+                }
+            })
+            return response.data
+        },
+            {
+                enabled: false,
+                refetchOnWindowFocus: false,
+                onSuccess: () => {
+                    queryClient.invalidateQueries('github-repos')
+                },
+            }
+        )
     }
 }
 

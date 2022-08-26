@@ -1,7 +1,7 @@
 module.exports = [
   {
     method: 'GET',
-    path: '/repos',  //=> available at route: //localhost:1337/github-projects/repos
+    path: '/repos',
     handler: 'getReposController.index',
     config: {
       policies: ['admin::isAuthenticatedAdmin'],
@@ -10,7 +10,7 @@ module.exports = [
   },
   {
     method: 'POST',
-    path: '/project',  //=> available at route: //localhost:1337/github-projects/repos
+    path: '/project',
     handler: 'projectController.create',
     config: {
       policies: ['admin::isAuthenticatedAdmin'],
@@ -18,8 +18,24 @@ module.exports = [
   },
   {
     method: 'DELETE',
-    path: '/project/:id',  //=> available at route: //localhost:1337/github-projects/repos
+    path: '/project/:id',
     handler: 'projectController.delete',
+    config: {
+      policies: ['admin::isAuthenticatedAdmin'],
+    },
+  },
+  {
+    method: 'POST',
+    path: '/projects',
+    handler: 'projectController.createMany',
+    config: {
+      policies: ['admin::isAuthenticatedAdmin'],
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/projects',
+    handler: 'projectController.deleteMany',
     config: {
       policies: ['admin::isAuthenticatedAdmin'],
     },

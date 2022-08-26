@@ -3,38 +3,12 @@ import { Table, Thead, Tbody, Tr, Td, Th } from '@strapi/design-system/Table'
 import { Box, BaseCheckbox, Typography, Loader, Alert, Flex, IconButton, Link } from '@strapi/design-system'
 import { Pencil, Trash, Plus } from '@strapi/icons'
 import styled from 'styled-components'
-import Octokit from '../../api/services/Octokit'
 import { ConfirmationDialog } from '../ConfirmationDialog/ConfirmationDialog'
 import { BulkActions } from '../BulkActions'
+import { useReposContext } from '../../context'
+import { alertContent } from '../../helpers/serializers'
 
 const COL_COUNT = 5
-
-const alertContent = (status, projectId) => {
-    if (status === 'CREATE') return {
-        success: {
-            title: 'Project created',
-            message: `Successfully created project ${projectId}`,
-            variant: 'success'
-        },
-        error: {
-            title: 'An error occurred',
-            message: 'Error creating the project. Please retry',
-            variant: 'danger'
-        }
-    }
-    if (status === 'DELETE') return {
-        success: {
-            title: 'Project deleted',
-            message: `Successfully deleted project ${projectId}`,
-            variant: 'success'
-        },
-        error: {
-            title: 'An error occurred',
-            message: 'Error deleting the project. Please retry',
-            variant: 'danger'
-        }
-    }
-}
 
 const AlertContainer = styled.div`
     position: absolute;
@@ -53,47 +27,56 @@ const DescriptionTd = styled(Td)`
 `
 
 const Repo = () => {
-    const { data: repos, isLoading, isError, error, isFetching } = Octokit.useGithub()
-    const { mutateAsync: createProject, isLoading: isMutateLoading, } = Octokit.useAddProject()
-    const { mutateAsync: deleteProject, isLoading: isDeleteLoading } = Octokit.useDeleteProject()
+    const {
+        useGithub,
+        useAddProject,
+        useDeleteProject,
+        useAddManyProjects,
+        useDeleteManyProjects,
+        selectedRepos,
+        setSelectedRepos,
+        alerts,
+        setAlerts
+    } = useReposContext()
 
-    const [selectedRepos, setSelectedRepos] = React.useState([])
-    const [alerts, setAlerts] = React.useState([])
+
     const [deletingProject, setDeletingProject] = React.useState(undefined)
 
-    if (isLoading) return <Loader style={{ textAlign: 'center', marginTop: '30px' }}>{''}</Loader>
-    if (isError) return <Alert
+    if (useGithub.isLoading) return <Loader style={{ textAlign: 'center', marginTop: '30px' }}>{''}</Loader>
+    if (useGithub.isError) return <Alert
         closeLabel='Close alert'
         title='Error fetching repositories'
         variant='danger'
     >
-        {(error.response?.data?.error?.message || error.message)}
+        {(useGithub.error?.response?.data?.error?.message || useGithub.error?.message)}
     </Alert>
 
-    const allChecked = repos.length === selectedRepos.length
-    const isIndeterminate = repos.length > 0 && !allChecked // some repos selected but not all
+    const allChecked = useGithub.data.length === selectedRepos.length
+    const isIndeterminate = useGithub.data.length > 0 && !allChecked // some repos selected but not all
+
+    const isLoadingData = useGithub.isFetching || useAddProject.isLoading || useDeleteProject.isLoading || useAddManyProjects.isLoading || useDeleteManyProjects.isLoading
 
     const handleCreateClick = async (currentRepo) => {
-        const response = await createProject(currentRepo)
+        const response = await useAddProject.mutateAsync(currentRepo)
         if (response) {
-            setAlerts([...alerts, alertContent('CREATE', currentRepo.id).success])
+            setAlerts([...alerts, alertContent('CREATE_ONE', { projectId: currentRepo.id }).success])
         } else {
-            setAlerts([...alerts, alertContent('CREATE', currentRepo.id).error])
+            setAlerts([...alerts, alertContent('CREATE_ONE', { projectId: currentRepo.id }).error])
         }
     }
     const handleDeleteClick = async (projectId) => {
-        const response = await deleteProject(projectId)
+        const response = await useDeleteProject.mutateAsync(projectId)
         if (response) {
-            setAlerts([...alerts, alertContent('DELETE', projectId).success])
+            setAlerts([...alerts, alertContent('DELETE_ONE', { projectId }).success])
         } else {
-            setAlerts([...alerts, alertContent('DELETE', projectId).error])
+            setAlerts([...alerts, alertContent('DELETE_ONE', { projectId }).error])
         }
     }
 
     const closeHandler = (alertId) => {
         setAlerts(alerts.filter((alert, idx) => alertId !== idx))
     }
-    console.log({ repos })
+
     return (
         <Box padding={8} background="neutral100">
             {deletingProject && (
@@ -120,14 +103,14 @@ const Repo = () => {
             {
                 selectedRepos.length > 0 && (
                     <BulkActions
-                        selectedRepos={
+                        checkedRepos={
                             selectedRepos.map(
-                                repoId => repos.find(repo => repo.id === repoId)
+                                repoId => useGithub.data.find(repo => repo.id === repoId)
                             )
                         } />
                 )
             }
-            <Table colCount={COL_COUNT} rowCount={repos.length}>
+            <Table colCount={COL_COUNT} rowCount={useGithub.data.length}>
                 <Thead>
                     <Tr>
                         <Th>
@@ -135,7 +118,7 @@ const Repo = () => {
                                 aria-label="Select all entries"
                                 indeterminate={isIndeterminate}
                                 value={allChecked}
-                                onValueChange={value => value ? setSelectedRepos(repos.map(repo => repo.id)) : setSelectedRepos([])}
+                                onValueChange={value => value ? setSelectedRepos(useGithub.data.map(repo => repo.id)) : setSelectedRepos([])}
                             />
                         </Th>
                         <Th>
@@ -153,7 +136,7 @@ const Repo = () => {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {repos.map(repo => {
+                    {useGithub.data.map(repo => {
                         const { id, name, shortDescription, url, projectId } = repo
                         return (
                             <Tr key={id}>
@@ -186,7 +169,7 @@ const Repo = () => {
                                             <Flex>
                                                 <Link to={`/content-manager/collectionType/plugin::github-projects.project/${projectId}`}>
                                                     <IconButton
-                                                        disabled={isFetching || isMutateLoading || isDeleteLoading}
+                                                        disabled={isLoadingData}
                                                         label="Edit"
                                                         noBorder
                                                         icon={<Pencil />}
@@ -194,7 +177,7 @@ const Repo = () => {
                                                 </Link>
                                                 <Box paddingLeft={1}>
                                                     <IconButton
-                                                        disabled={isFetching || isMutateLoading || isDeleteLoading}
+                                                        disabled={isLoadingData}
                                                         label="Delete"
                                                         noBorder
                                                         onClick={() => setDeletingProject(projectId)}
@@ -203,7 +186,7 @@ const Repo = () => {
                                                 </Box>
                                             </Flex> :
                                             <IconButton
-                                                disabled={isFetching || isMutateLoading || isDeleteLoading}
+                                                disabled={isLoadingData}
                                                 label="Add"
                                                 noBorder icon={<Plus />}
                                                 onClick={() => handleCreateClick(repo)}

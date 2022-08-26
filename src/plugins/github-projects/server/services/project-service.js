@@ -23,6 +23,24 @@ module.exports = ({ strapi }) => ({
             .delete("plugin::github-projects.project", projectId)
 
         return deletedProject
+    },
+    createMany: async (repos, userId) => {
+        const createPromises = repos.map(
+            async (repo) => await strapi
+                .plugin('github-projects')
+                .service('projectService')
+                .create(repo, userId)
+        )
+        return Promise.all(createPromises)
+    },
+    deleteMany: async (projectIds) => {
+        const deletePromises = projectIds.map(
+            async (projectId) => await strapi
+                .plugin('github-projects')
+                .service('projectService')
+                .delete(projectId)
+        )
+        return Promise.all(deletePromises)
     }
 
 })

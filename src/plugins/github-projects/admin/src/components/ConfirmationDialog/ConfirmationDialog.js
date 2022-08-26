@@ -2,8 +2,9 @@ import React from 'react'
 import { Dialog, DialogBody, DialogFooter } from '@strapi/design-system/Dialog'
 import { Stack, Flex, Typography, Button } from '@strapi/design-system'
 import { ExclamationMarkCircle, Trash } from '@strapi/icons'
-
+let i = 0
 const ConfirmationDialog = ({ visible, message, onClose, onConfirm }) => {
+    console.log(i++)
     return (
         <Dialog
             onClose={onClose}
