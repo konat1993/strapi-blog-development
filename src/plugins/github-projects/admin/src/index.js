@@ -23,7 +23,7 @@ export default {
       permissions: [
         // Uncomment to set the permissions of the plugin here
         // {
-        //   action: '', // the action name should be plugin::plugin-name.actionType
+        //   action: 'plugin::github-projects.use', // the action name should be plugin::plugin-name.actionType
         //   subject: null,
         // },
       ],

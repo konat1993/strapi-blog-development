@@ -57,19 +57,19 @@ const Repo = () => {
     const isLoadingData = useGithub.isFetching || useAddProject.isLoading || useDeleteProject.isLoading || useAddManyProjects.isLoading || useDeleteManyProjects.isLoading
 
     const handleCreateClick = async (currentRepo) => {
-        const response = await useAddProject.mutateAsync(currentRepo)
-        if (response) {
+        try {
+            await useAddProject.mutateAsync(currentRepo)
             setAlerts([...alerts, alertContent('CREATE_ONE', { projectId: currentRepo.id }).success])
-        } else {
-            setAlerts([...alerts, alertContent('CREATE_ONE', { projectId: currentRepo.id }).error])
+        } catch (error) {
+            setAlerts([...alerts, alertContent('CREATE_ONE', { projectId: currentRepo.id, error }).error])
         }
     }
     const handleDeleteClick = async (projectId) => {
-        const response = await useDeleteProject.mutateAsync(projectId)
-        if (response) {
+        try {
+            await useDeleteProject.mutateAsync(projectId)
             setAlerts([...alerts, alertContent('DELETE_ONE', { projectId }).success])
-        } else {
-            setAlerts([...alerts, alertContent('DELETE_ONE', { projectId }).error])
+        } catch (error) {
+            setAlerts([...alerts, alertContent('DELETE_ONE', { projectId, error }).error])
         }
     }
 

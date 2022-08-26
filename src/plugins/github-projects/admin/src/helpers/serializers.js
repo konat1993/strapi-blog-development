@@ -1,4 +1,6 @@
-const alertContent = (type, { projectId, response }) => {
+const alertContent = (type, { projectId, response, error }) => {
+    const errorMessage = error?.toString()
+    const errorStatusText = error?.response?.statusText
     switch (type) {
         case 'CREATE_ONE': return {
             success: {
@@ -8,7 +10,7 @@ const alertContent = (type, { projectId, response }) => {
             },
             error: {
                 title: 'An error occurred',
-                message: 'Error creating the project. Please retry',
+                message: 'Error creating the project: ' + errorStatusText || errorMessage,
                 variant: 'danger'
             }
         }
@@ -20,31 +22,31 @@ const alertContent = (type, { projectId, response }) => {
             },
             error: {
                 title: 'An error occurred',
-                message: 'Error deleting the project. Please retry',
+                message: 'Error deleting the project: ' + errorStatusText || errorMessage,
                 variant: 'danger'
             }
         }
         case 'CREATE_MANY': return {
             success: {
                 title: 'Projects created',
-                message: `Successfully created ${response.length > 1 ? response.length + ' projects' : response.length + ' project'} `,
+                message: response && `Successfully created ${response.length > 1 ? response.length + ' projects' : response.length + ' project'} `,
                 variant: 'success'
             },
             error: {
                 title: 'An error occurred',
-                message: 'Error creating projects. Please retry',
+                message: 'Error creating projects: ' + errorStatusText || errorMessage,
                 variant: 'danger'
             }
         }
         case 'DELETE_MANY': return {
             success: {
                 title: 'Projects deleted',
-                message: `Successfully deleted ${response.length > 1 ? response.length + ' projects' : response.length + ' project'} `,
+                message: response && `Successfully deleted ${response.length > 1 ? response.length + ' projects' : response.length + ' project'} `,
                 variant: 'success'
             },
             error: {
                 title: 'An error occurred',
-                message: 'Error deleting projects. Please retry',
+                message: 'Error deleting projects: ' + errorStatusText || errorMessage,
                 variant: 'danger'
             }
         }

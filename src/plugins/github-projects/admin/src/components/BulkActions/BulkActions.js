@@ -22,25 +22,25 @@ const BulkActions = ({ checkedRepos }) => {
     const projectsToBeDeleted = reposWithProjects.length
 
     const handleCreateClick = async (reposToBecomeProjects) => {
-        const response = await useAddManyProjects.mutateAsync(reposToBecomeProjects)
-
-        if (response) {
+        try {
+            const response = await useAddManyProjects.mutateAsync(reposToBecomeProjects)
             setAlerts([...alerts, alertContent('CREATE_MANY', { response }).success])
-        } else {
-            setAlerts([...alerts, alertContent('CREATE_MANY', { response }).error])
+        } catch (error) {
+            setAlerts([...alerts, alertContent('CREATE_MANY', { error }).error])
         }
+
         setSelectedRepos([])
 
     }
     const handleDeleteClick = async (projectsToDelete) => {
         const projectIds = projectsToDelete.map(project => project.projectId)
-        const response = await useDeleteManyProjects.mutateAsync(projectIds)
-
-        if (response) {
+        try {
+            const response = await useDeleteManyProjects.mutateAsync(projectIds)
             setAlerts([...alerts, alertContent('DELETE_MANY', { response }).success])
-        } else {
-            setAlerts([...alerts, alertContent('DELETE_MANY', { response }).error])
+        } catch (error) {
+            setAlerts([...alerts, alertContent('DELETE_MANY', { error }).error])
         }
+
         setSelectedRepos([])
     }
     console.log({ deletingProjects })

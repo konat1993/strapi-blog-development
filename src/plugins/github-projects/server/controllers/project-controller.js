@@ -2,6 +2,7 @@
 
 module.exports = ({ strapi }) => ({
     create: async (ctx) => {
+        console.log('elo')
         const repo = ctx.request.body
         const newProject = await strapi
             .plugin('github-projects')

@@ -20,7 +20,7 @@ const ReposProvider = ({ children }) => {
 
     const [selectedRepos, setSelectedRepos] = React.useState([])
 
-
+    console.log('data', useAddProject)
     const state = {
         useGithub,
         useAddProject,
