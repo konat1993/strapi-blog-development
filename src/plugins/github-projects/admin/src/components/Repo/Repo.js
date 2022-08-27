@@ -7,6 +7,8 @@ import { ConfirmationDialog } from '../ConfirmationDialog/ConfirmationDialog'
 import { BulkActions } from '../BulkActions'
 import { useReposContext } from '../../context'
 import { alertContent } from '../../helpers/serializers'
+import { useIntl } from 'react-intl'
+import getTrad from '../../utils/getTrad'
 
 const COL_COUNT = 5
 
@@ -38,6 +40,8 @@ const Repo = () => {
         alerts,
         setAlerts
     } = useReposContext()
+
+    const { formatMessage } = useIntl()
 
 
     const [deletingProject, setDeletingProject] = React.useState(undefined)
@@ -122,16 +126,35 @@ const Repo = () => {
                             />
                         </Th>
                         <Th>
-                            <Typography variant="sigma">Name</Typography>
+                            <Typography variant="sigma">
+                                {formatMessage({
+                                    id: getTrad('repo.name')
+                                })}
+                            </Typography>
                         </Th>
                         <Th>
-                            <Typography variant="sigma">Description</Typography>
+                            <Typography variant="sigma">
+                                {formatMessage({
+                                    id: getTrad('repo.description'),
+                                    defaultMessage: 'Description'
+                                })}
+                            </Typography>
                         </Th>
                         <Th>
-                            <Typography variant="sigma">Url</Typography>
+                            <Typography variant="sigma">
+                                {formatMessage({
+                                    id: getTrad('repo.url'),
+                                    defaultMessage: 'Url'
+                                })}
+                            </Typography>
                         </Th>
                         <Th>
-                            <Typography variant="sigma">Actions</Typography>
+                            <Typography variant="sigma">
+                                {formatMessage({
+                                    id: getTrad('repo.actions'),
+                                    defaultMessage: 'Actions'
+                                })}
+                            </Typography>
                         </Th>
                     </Tr>
                 </Thead>
