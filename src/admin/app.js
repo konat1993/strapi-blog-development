@@ -15,6 +15,8 @@ const config = {
   // But probably better to use custom translations in custom plugins
   // As strapi prepared this file structure for us
   // to apply this we need to import internationalization hook inside Repo.js
+  // BUT if you want to extract your custom plugin to npm package you better make internationalization
+  // inside pl.json inside plugin, not here
   // translations: {
   //   pl: {
   //     "github-projects.plugin.name": "GH plugin ziomek"
