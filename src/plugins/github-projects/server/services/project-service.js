@@ -41,6 +41,16 @@ module.exports = ({ strapi }) => ({
                 .delete(projectId)
         )
         return Promise.all(deletePromises)
+    },
+    find: async (queryParams) => {
+        return await strapi
+            .entityService
+            .findMany('plugin::github-projects.project', queryParams)
+    },
+    findOne: async (projectId, queryParams) => {
+        return await strapi
+            .entityService
+            .findOne('plugin::github-projects.project', projectId, queryParams)
     }
 
 })
